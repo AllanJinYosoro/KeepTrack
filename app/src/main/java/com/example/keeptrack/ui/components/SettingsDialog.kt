@@ -22,7 +22,7 @@ fun SettingsDialog(
     onAddType: (ExerciseType) -> Unit,
     onDeleteType: (ExerciseType) -> Unit
 ) {
-    var goalText by remember { mutableStateOf(currentGoal.toInt().toString()) }
+    var goalText by remember { mutableStateOf(currentGoal.toString()) }
     var showAddDialog by remember { mutableStateOf(false) }
 
     AlertDialog(

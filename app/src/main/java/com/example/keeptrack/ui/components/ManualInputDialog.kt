@@ -16,18 +16,29 @@ fun ManualInputDialog(
     onSave: (Long) -> Unit
 ) {
     var minutesText by remember { mutableStateOf("") }
+    var secondsText by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = "输入时长: ${exerciseType.name}") },
         text = {
-            Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 OutlinedTextField(
                     value = minutesText,
                     onValueChange = { minutesText = it },
                     label = { Text("分钟") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.weight(1f)
+                )
+                OutlinedTextField(
+                    value = secondsText,
+                    onValueChange = { secondsText = it },
+                    label = { Text("秒") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.weight(1f)
                 )
             }
         },
@@ -35,8 +46,10 @@ fun ManualInputDialog(
             TextButton(
                 onClick = {
                     val mins = minutesText.toLongOrNull() ?: 0L
-                    if (mins > 0) {
-                        onSave(mins * 60000)
+                    val secs = secondsText.toLongOrNull() ?: 0L
+                    val totalMillis = (mins * 60 + secs) * 1000
+                    if (totalMillis > 0) {
+                        onSave(totalMillis)
                     }
                 }
             ) {

@@ -76,7 +76,7 @@ fun DashboardScreen(viewModel: MainViewModel) {
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "${totalMinutes.toInt()} / ${goal.toInt()} 加权分钟",
+                        text = "${"%.1f".format(totalMinutes)} / ${"%.1f".format(goal)} 加权分钟",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium
                     )
