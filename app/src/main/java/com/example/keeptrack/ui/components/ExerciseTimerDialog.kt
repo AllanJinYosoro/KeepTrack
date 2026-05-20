@@ -8,22 +8,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.keeptrack.data.ExerciseType
-import kotlinx.coroutines.delay
+import com.example.keeptrack.ui.MainViewModel
 
 @Composable
 fun ExerciseTimerDialog(
     exerciseType: ExerciseType,
-    onDismiss: () -> Unit,
-    onSave: (Long) -> Unit
+    viewModel: MainViewModel,
+    onDismiss: () -> Unit
 ) {
-    var secondsElapsed by remember { mutableLongStateOf(0L) }
-    var isRunning by remember { mutableStateOf(true) }
+    val secondsElapsed by viewModel.timerSecondsElapsed.collectAsState()
+    val isRunning by viewModel.isTimerRunning.collectAsState()
 
-    LaunchedEffect(isRunning) {
-        while (isRunning) {
-            delay(1000)
-            secondsElapsed++
-        }
+    LaunchedEffect(Unit) {
+        viewModel.startTimer()
     }
 
     AlertDialog(
@@ -41,22 +38,31 @@ fun ExerciseTimerDialog(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = { isRunning = !isRunning }) {
+                    Button(onClick = { 
+                        if (isRunning) viewModel.pauseTimer() else viewModel.resumeTimer()
+                    }) {
                         Text(if (isRunning) "暂停" else "开始")
                     }
-                    Button(onClick = { secondsElapsed = 0 }) {
+                    Button(onClick = { viewModel.stopTimer(); viewModel.startTimer() }) {
                         Text("重置")
                     }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSave(secondsElapsed * 1000) }) {
+            TextButton(onClick = { 
+                viewModel.addRecord(exerciseType, secondsElapsed * 1000)
+                viewModel.stopTimer()
+                onDismiss()
+            }) {
                 Text("完成并记录")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = {
+                viewModel.stopTimer()
+                onDismiss()
+            }) {
                 Text("取消")
             }
         }

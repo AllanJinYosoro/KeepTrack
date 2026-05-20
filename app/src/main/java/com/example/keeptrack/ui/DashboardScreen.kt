@@ -115,11 +115,8 @@ fun DashboardScreen(viewModel: MainViewModel) {
         selectedTypeForTimer?.let { type ->
             ExerciseTimerDialog(
                 exerciseType = type,
-                onDismiss = { selectedTypeForTimer = null },
-                onSave = { 
-                    viewModel.addRecord(type, it)
-                    selectedTypeForTimer = null
-                }
+                viewModel = viewModel,
+                onDismiss = { selectedTypeForTimer = null }
             )
         }
 
