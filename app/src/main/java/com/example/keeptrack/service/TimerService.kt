@@ -170,35 +170,57 @@ class TimerService : Service() {
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             else
                 WindowManager.LayoutParams.TYPE_PHONE,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.START
             x = 100
-            y = 100
+            y = 300
         }
         bubbleParams = params
 
-        val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        // Since we don't have a layout XML for the bubble yet, we'll create it programmatically or use a simple view
-        // For simplicity in this step, let's create a simple layout programmatically
         val container = android.widget.LinearLayout(this).apply {
-            orientation = android.widget.LinearLayout.VERTICAL
-            setBackgroundColor(android.graphics.Color.argb(200, 0, 0, 0))
-            setPadding(20, 20, 20, 20)
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            val padding = (12 * resources.displayMetrics.density).toInt()
+            val sidePadding = (16 * resources.displayMetrics.density).toInt()
+            setPadding(sidePadding, padding, sidePadding, padding)
+            
+            // Background with rounded corners
+            val shape = android.graphics.drawable.GradientDrawable().apply {
+                shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+                cornerRadius = 60f
+                setColor(android.graphics.Color.parseColor("#EE333333")) // Dark semi-transparent
+                setStroke(2, android.graphics.Color.WHITE)
+            }
+            background = shape
+            elevation = 10f
         }
 
         val timeText = TextView(this).apply {
-            id = View.generateViewId()
             setTextColor(android.graphics.Color.WHITE)
-            textSize = 18f
+            textSize = 16f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
             text = formatTime(_secondsElapsed.value)
         }
         container.addView(timeText)
 
-        val btnToggle = Button(this).apply {
-            id = View.generateViewId()
+        // Spacer
+        val spacer = View(this).apply {
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                (12 * resources.displayMetrics.density).toInt(),
+                0
+            )
+        }
+        container.addView(spacer)
+
+        val btnToggle = Button(this, null, 0, android.R.style.Widget_Material_Button_Borderless).apply {
+            setTextColor(android.graphics.Color.CYAN)
+            textSize = 14f
             text = if (_isRunning.value) "暂停" else "开始"
+            setPadding(0, 0, 0, 0)
+            minimumWidth = 0
+            minimumHeight = 0
             setOnClickListener {
                 if (_isRunning.value) pauseTimer() else resumeTimer()
             }
@@ -262,7 +284,7 @@ class TimerService : Service() {
         serviceScope.launch {
             bubbleView?.let { container ->
                 val timeText = (container as android.widget.LinearLayout).getChildAt(0) as TextView
-                val btnToggle = container.getChildAt(1) as Button
+                val btnToggle = container.getChildAt(2) as Button // Index 2 because of spacer
                 timeText.text = formatTime(_secondsElapsed.value)
                 btnToggle.text = if (_isRunning.value) "暂停" else "开始"
             }
