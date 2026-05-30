@@ -14,3 +14,30 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Gradle / Android build outputs
+build/
+*/build/
+app/release/
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+
+# Generated profiling / reports
+baselineProfiles/
+lint-results*.html
+lint-results*.xml
+
+# Signing and secrets
+*.jks
+*.keystore
+keystore.properties
+secrets.properties
+
+# Local environment and logs
+.env
+.env.*
+*.log
+hs_err_pid*
